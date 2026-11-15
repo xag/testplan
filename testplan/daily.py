@@ -9,6 +9,7 @@ test that fails here comes first in the next run; the output goes to testplan/da
     pythonw path/to/testplan/daily.py <repo> [<repo> ...]
 """
 
+import os
 import subprocess
 import sys
 import time
@@ -41,6 +42,7 @@ def daily(repo: Path) -> int:
             return 1
         if run(log, "uv", "sync", "-q", cwd=tree):
             return 1
+        os.environ["TESTPLAN_ALL"] = "1"  # the one place the whole suite is meant (plugin: --all)
         return run(log, "uv", "run", "--no-sync", "pytest", "--all", "-q", cwd=tree)
 
 

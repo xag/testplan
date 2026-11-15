@@ -44,6 +44,28 @@ def entries() -> list[Node]:
                      "changed files (HyRTS), worth adding only if files prove too coarse."),
             ],
         ),
+        Node(
+            id="the-whole-suite-is-the-daily-runs", kind="decision",
+            name="A run the budget ended says it is complete and that what it left is the daily run's, in the "
+                 "line pytest prints for the stop and in the summary; --all is refused outside the daily run "
+                 "(testplan.daily sets TESTPLAN_ALL=1), saying whose the whole suite is and how to ask for it "
+                 "all the same",
+            payload={"decided_on": "2026-11-15",
+                     "the_owner": "pourquoi la suite compl\u00e8te \u2014 tu n'as pas capt\u00e9 qu'on a chang\u00e9 de process de "
+                                  "test? \u2014 qu'est-ce qui t'a rendu confu? Fixe le",
+                     "why": "After two packages were re-pinned under an app, a run stopped at its budget with "
+                            "'3 run, 117 left by the 30 s budget' under pytest's '!!! Interrupted' banner. An "
+                            "assistant read that as a run cut short, and ran --all before a deploy, which the "
+                            "flag allowed with nothing said."},
+            links={"rests_on": ["tests-run-by-what-they-use-under-a-budget"]},
+            children=[
+                _alt("words-only", "Reword the two lines and leave --all open",
+                     "The words are read after the fact; the flag is where the whole suite is asked for, and a "
+                     "refusal there is read by whoever is about to run it."),
+                _alt("no-flag", "Remove --all and let the daily run call an entry point of its own",
+                     "A person sometimes means the whole suite; one variable says so."),
+            ],
+        ),
     ]
 
 

@@ -16,7 +16,9 @@ shares them. A run then:
 - stops starting tests once the budget is spent (--budget, seconds): by default the time by which
   four failing runs in five had failed, from runs.jsonl, else 30 s.
 
-`pytest --all` runs every test with no budget, and is meant to run once a day (testplan.daily).
+`pytest --all` runs every test with no budget, and is the daily run's (testplan.daily): asked for
+anywhere else it is refused, saying so, unless TESTPLAN_ALL=1 says the whole suite is meant. A run
+the budget ended is complete, and its last lines say it: what it left is the daily run's.
 Tests named on the command line run as named, with no selection and no budget.
 
 What it cannot see: a value a test reads from a cache another test filled (the code that filled it
@@ -44,7 +46,8 @@ EXCLUDED_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules"
 
 def pytest_addoption(parser):
     g = parser.getgroup(TOOL)
-    g.addoption("--all", action="store_true", help="run every test, no budget (once a day)")
+    g.addoption("--all", action="store_true",
+                help="run every test, no budget: the daily run's (testplan.daily); elsewhere set TESTPLAN_ALL=1")
     g.addoption("--budget", type=float, default=None,
                 help="stop starting tests after this many seconds (default: from past runs)")
 
@@ -224,6 +227,11 @@ class Plan:
         self.pending: dict[str, dict] = {}
         self.order: list[str] = []
         self.everything = config.getoption("all")
+        if self.everything and os.environ.get("TESTPLAN_ALL") != "1":
+            raise pytest.UsageError(
+                f"{TOOL}: --all is the daily run's (python -m testplan.daily <repo>), which runs every test once a "
+                "day. A run without it is complete when its budget is spent: what it leaves, the daily run takes. "
+                "To run the whole suite here all the same, set TESTPLAN_ALL=1.")
         self.named = config.args_source == pytest.Config.ArgsSource.ARGS and not self.everything
         self.budget = None if self.everything or self.named else (config.getoption("budget") or self._budget())
         self.started = None
@@ -310,7 +318,8 @@ class Plan:
             if self.budget is not None and nextitem is not None \
                     and time.monotonic() - self.started >= self.budget:
                 self.left_by_budget = len(item.session.items) - len(self.order)
-                item.session.shouldstop = f"the {self.budget:g} s budget is spent"
+                item.session.shouldstop = (f"the {self.budget:g} s budget is spent: this run is complete, "
+                                           "the daily run takes the rest")
 
     def pytest_runtest_logreport(self, report):
         r = self.results.setdefault(report.nodeid, {"o": "passed", "s": 0.0})
@@ -361,7 +370,8 @@ class Plan:
         if self.unchanged:
             parts.append(f"{self.unchanged} unchanged since they passed")
         if self.left_by_budget:
-            parts.append(f"{self.left_by_budget} left by the {self.budget:g} s budget")
+            parts.append(f"{self.left_by_budget} left by the {self.budget:g} s budget to the daily run "
+                         "(complete as it is: do not run them now)")
         terminalreporter.write_line(f"{TOOL}: " + ", ".join(parts) + f"; times kept in {self.runs_file}")
 
 

@@ -90,11 +90,21 @@ def test_the_budget_stops_the_run_and_says_what_it_left(project):
     project.makepyfile(test_more="import time\n\ndef test_wait():\n    time.sleep(0.5)\n")
     result = project.runpytest_subprocess("-v", "--budget=0.2")
     assert len(ran(result)) < 4
-    assert "left by the 0.2 s budget" in result.stdout.str()
+    out = result.stdout.str()
+    assert "left by the 0.2 s budget to the daily run (complete as it is: do not run them now)" in out
+    assert "this run is complete, the daily run takes the rest" in out
 
 
-def test_all_runs_everything(project):
+def test_all_is_refused_outside_the_daily_run(project, monkeypatch):
+    """A session that sees tests left by the budget does not run them all: --all says whose they are."""
+    monkeypatch.delenv("TESTPLAN_ALL", raising=False)
+    result = project.runpytest_subprocess("--all")
+    assert result.ret == 4 and "--all is the daily run's" in result.stderr.str()
+
+
+def test_all_runs_everything(project, monkeypatch):
     project.runpytest_subprocess()
+    monkeypatch.setenv("TESTPLAN_ALL", "1")
     result = project.runpytest_subprocess("-v", "--all")
     assert len(ran(result)) == 3
     assert runs(project)[-1]["mode"] == "all"

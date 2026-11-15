@@ -1,0 +1,32 @@
+[
+  {
+    "path": "tests-run-by-what-they-use-under-a-budget",
+    "kind": "decision",
+    "digest": "2ec94c1eb57e"
+  },
+  {
+    "path": "tests-run-by-what-they-use-under-a-budget/functions",
+    "kind": "alternative",
+    "digest": "2a1476028aef"
+  },
+  {
+    "path": "tests-run-by-what-they-use-under-a-budget/testmon",
+    "kind": "alternative",
+    "digest": "a9dec694fbba"
+  },
+  {
+    "path": "the-whole-suite-is-the-daily-runs",
+    "kind": "decision",
+    "digest": "383cab8e38cd"
+  },
+  {
+    "path": "the-whole-suite-is-the-daily-runs/no-flag",
+    "kind": "alternative",
+    "digest": "88f4acea86c8"
+  },
+  {
+    "path": "the-whole-suite-is-the-daily-runs/words-only",
+    "kind": "alternative",
+    "digest": "5b51836ed444"
+  }
+]
