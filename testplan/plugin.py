@@ -388,6 +388,4 @@ def _load_runs(path):
 
 
 def pytest_configure(config):
-    if not hasattr(sys, "monitoring"):
-        return
     config.pluginmanager.register(Plan(config), TOOL + "-run")

@@ -2,7 +2,7 @@
 name = "testplan"
 version = "0.1.0"
 description = "A pytest plugin: run the tests whose code, data or packages changed since they passed, last failures first then the fastest, under a time budget, every run's times kept."
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = ["pytest>=8.0.0"]
 
 [project.entry-points.pytest11]
