@@ -1,12 +1,14 @@
 """The daily run of the whole suite, for each repo named: origin/main, in a worktree of its own
 (<repo>-daily beside it), every test, no budget.
 
-Meant for a scheduled task run by pythonw (no window); it needs only the standard library. Each
+Meant for a scheduled task whose action is the base interpreter's pythonw.exe running the hidden launcher (the poietic
+plugin's tools/run-hidden/run_hidden.py -- python.exe daily.py <repo> ...), never a virtual environment's pythonw.exe, which is a
+console program and opens a window. Every process it starts is made with CREATE_NO_WINDOW; it needs only the standard library. Each
 repo's times and outcomes go where every run's go (testplan/runs.jsonl in its git directory), so a
 test that fails here comes first in the next run; the output goes to testplan/daily.log.
 
-    pythonw -m testplan.daily <repo> [<repo> ...]
-    pythonw path/to/testplan/daily.py <repo> [<repo> ...]
+    python -m testplan.daily <repo> [<repo> ...]
+    python path/to/testplan/daily.py <repo> [<repo> ...]      (from the task: through the hidden launcher)
 """
 
 import os
